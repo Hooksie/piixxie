@@ -1,13 +1,41 @@
 import argparse
 import sys
 
-from PIL import Image
+from PIL import Image, ImageDraw
 
 from .errors import PiixxieError, DimensionError
 
 
 DEFAULT_SOURCE_PIXEL = 1
 DEFAULT_SCALE = 1
+
+
+def drawpixel(target: ImageDraw, x, y, size, color):
+    target.rectangle((x * size, y * size, (x + 1) * size, (y + 1) * size), fill=color)
+
+
+def process(input: Image, output: Image, pixel: int, scale: int):
+    """
+    Do the needful.
+    """
+    size = pixel * scale
+    x = y = 0
+    source_x, source_y = input.size
+
+    draw = ImageDraw.Draw(output)
+
+    while True:
+        color = input.getpixel((x * pixel, y * pixel))
+        drawpixel(draw, x, y, size, color)
+
+        x += 1
+
+        if x * pixel >= source_x:
+            x = 0
+            y += 1
+
+            if y * pixel >= source_y:
+                break
 
 
 def verify(source: Image, pixel: int):
@@ -39,7 +67,7 @@ def prepare(source: Image, scale: int):
     Move from paths to images to actual image objects.
     """
     source_x, source_y = source.size
-    output_im = Image.new('RGB', (source_x * scale, source_y * scale))
+    output_im = Image.new(source.mode, (source_x * scale, source_y * scale))
 
     return output_im
 
@@ -59,6 +87,8 @@ def main(args=None):
     try:
         input_im = verify_path(settings.input, settings.pixel)
         output_im = prepare(input_im, settings.scale)
+        process(input_im, output_im, settings.pixel, settings.scale)
+        output_im.save(settings.output)
 
     except PiixxieError as err:
         sys.exit("fatal: {}".format(err))
