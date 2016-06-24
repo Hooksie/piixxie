@@ -1,0 +1,5 @@
+from .pix import main
+
+
+if __name__ == '__main__':
+    main()
