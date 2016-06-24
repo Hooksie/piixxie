@@ -3,7 +3,7 @@ import sys
 
 from PIL import Image, ImageDraw
 
-from .errors import PiixxieError, DimensionError
+from piixxie.errors import PiixxieError, DimensionError
 
 
 DEFAULT_SOURCE_PIXEL = 1
@@ -25,8 +25,24 @@ def process(input: Image, output: Image, pixel: int, scale: int):
     draw = ImageDraw.Draw(output)
 
     while True:
-        color = input.getpixel((x * pixel, y * pixel))
-        drawpixel(draw, x, y, size, color)
+        # color = input.getpixel((x * pixel, y * pixel)
+        art_pixel = input.crop((x * pixel, y * pixel, (x + 1) * pixel, (y + 1) * pixel))
+        colors = list(art_pixel.getdata())
+        total_pixels = len(colors)
+
+        r = g = b = a = 0
+        for color in colors:
+            r += color[0]
+            g += color[1]
+            b += color[2]
+            a += color[3]
+
+        r //= total_pixels
+        g //= total_pixels
+        b //= total_pixels
+        a //= total_pixels
+
+        drawpixel(draw, x, y, size, (r, g, b, a))
 
         x += 1
 
