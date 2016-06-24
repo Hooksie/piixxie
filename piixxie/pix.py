@@ -89,7 +89,7 @@ def prepare(source: Image, scale: int):
 
 
 def main(args=None):
-    arg_parser = argparse.ArgumentParser()
+    arg_parser = argparse.ArgumentParser(prog='piixxie')
     arg_parser.add_argument('-p', '--pixel', dest='pixel', action='store', type=int, default=DEFAULT_SOURCE_PIXEL,
                             help="Side length of artistic pixel in source image.")
     arg_parser.add_argument('-s', '--scale', dest='scale', action='store', type=int, default=DEFAULT_SCALE,
