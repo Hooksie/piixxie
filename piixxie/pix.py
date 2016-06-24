@@ -10,25 +10,38 @@ DEFAULT_SOURCE_PIXEL = 1
 DEFAULT_SCALE = 1
 
 
-def verify(input: Image, pixel: int):
+def verify(source: Image, pixel: int):
     """
     Ensure that the given settings make sense with the input file.
 
     SPECIFICALLY, the dimensions of the source image must be multiples of `pixel`.
     """
-    size_x, size_y = input.size
+    size_x, size_y = source.size
 
     for dimension in (size_x, size_y):
         if dimension % pixel != 0:
             raise DimensionError("Source image dimensions must be a multiple of pixel size.")
 
+    return source
 
-def prepare(source: str, output: str, pixel: int, scale: int):
+
+def verify_path(source_path: str, pixel:int):
+    """
+    Wrapper around verify that takes a path to a file.
+    """
+    input_im = Image.open(source_path)
+
+    return verify(input_im, pixel)
+
+
+def prepare(source: Image, scale: int):
     """
     Move from paths to images to actual image objects.
     """
-    input_im = Image.open(source)
-    verify(input_im, pixel)
+    source_x, source_y = source.size
+    output_im = Image.new('RGB', (source_x * scale, source_y * scale))
+
+    return output_im
 
 
 def main(args=None):
@@ -44,7 +57,9 @@ def main(args=None):
     settings = arg_parser.parse_args(args)
 
     try:
-        prepare(settings.input, settings.output, settings.pixel, settings.scale)
+        input_im = verify_path(settings.input, settings.pixel)
+        output_im = prepare(input_im, settings.scale)
+
     except PiixxieError as err:
         sys.exit("fatal: {}".format(err))
 

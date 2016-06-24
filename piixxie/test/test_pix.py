@@ -47,3 +47,13 @@ class PixTests(TestCase):
         with self.assertRaises(errors.DimensionError):
             pix.verify(input_im, pixel_size)
 
+    def test_prepare_scaling(self):
+        """
+        Ensure image preparation scaled the output image properly.
+        """
+        input_im = Image.new('RGB', (24, 88))
+        output_im = pix.prepare(input_im, 2)
+
+        output_x, output_y = output_im.size
+        self.assertEqual(output_x, 48)
+        self.assertEqual(output_y, 176)
