@@ -75,6 +75,9 @@ def verify_path(source_path: str, pixel:int):
     """
     input_im = Image.open(source_path)
 
+    if input_im.mode != 'RGBA':
+        input_im = input_im.convert(mode='RGBA')
+
     return verify(input_im, pixel)
 
 
