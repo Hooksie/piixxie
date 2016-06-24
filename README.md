@@ -3,6 +3,8 @@ Piixxie
 
 A simple pixel art resizing tool.
 
+Scale pixel art images up easily without losing quality.
+
 Usage
 -----
 
